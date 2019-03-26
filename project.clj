@@ -14,7 +14,7 @@
 
   :main ^:skip-aot sheepish-3d.core
   :target-path "target/%s"
-  :source-paths ["src/clj" "src/cljs/sheepish_3d"]
+  :source-paths ["src/clj" "src/cljs" "src/cljs/sheepish_3d"]
   :resource-paths ["resources"]
 
   :aliases {"fig" ["trampoline" "run" "-m" "figwheel.main"]
