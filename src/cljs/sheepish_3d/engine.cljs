@@ -64,17 +64,14 @@
 (defn- h-intersect
   [pos angle unit]
   (let [[x y] pos
-        a angle
-        tan-a (Math/tan a)
-        Ya (if (pos? a) (- unit) unit)
-        Xa (if (zero? tan-a)
-             Ya
-             (/ Ya (Math/tan (- a))))
-        Ay (if (pos? a)
+        tan-a (Math/tan angle)
+        Ya (if (pos? angle) (- unit) unit)
+        Xa (if (zero? tan-a) Ya (/ Ya (Math/tan (- angle))))
+        Ay (if (pos? angle)
              (* (Math/floor (/ y unit)) unit)
              (+ (* (Math/floor (/ y unit)) unit) unit))
         Ax (+ x (/ (- y Ay) tan-a))
-        Ay (if (pos? a) (dec Ay) Ay)]
+        Ay (if (pos? angle) (dec Ay) Ay)]
     (loop [Ax Ax Ay Ay]
       (if (wall? [Ax Ay] unit)
         [Ax Ay]
@@ -83,15 +80,13 @@
 (defn- v-intersect
   [pos angle unit]
   (let [[x y] pos
-        a angle
         half-pi (/ Math/PI 2.0)
-        tan-a (Math/tan a)
         Xa (if (< (- half-pi) angle half-pi) unit (- unit))
-        Ya (* Xa (Math/tan (- a)))
+        Ya (* Xa (Math/tan (- angle)))
         Bx (if (< (- half-pi) angle half-pi)
              (+ (* (Math/floor (/ x unit)) unit) unit)
              (* (Math/floor (/ x unit)) unit))
-        By (+ y (* (- x Bx) (Math/tan a)))
+        By (+ y (* (- x Bx) (Math/tan angle)))
         Bx (if (< (- half-pi) angle half-pi) Bx (dec Bx))]
     (loop [Bx Bx By By]
       (if (wall? [Bx By] unit)
