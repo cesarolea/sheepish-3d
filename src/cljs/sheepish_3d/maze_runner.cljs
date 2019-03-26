@@ -67,6 +67,24 @@
     [(+ (- (* scale x) (/ scale 2)) (/ p-width 2))
      (+ (- (* scale y) (/ scale 2)) (/ p-height 2))]))
 
+(defn- h-intersect-bug
+  [pos angle unit]
+  (let [[x y] pos
+        a angle
+        tan-a (Math/tan a)
+        Ya (if (pos? a) (- unit) unit)
+        Xa (if (zero? tan-a)
+             Ya
+             (/ Ya (Math/tan (- a))))
+        Ay (if (pos? a)
+             (dec (* (Math/floor (/ y unit)) unit))
+             (+ (* (Math/floor (/ y unit)) unit) unit))
+        Ax (+ x (/ (- y Ay) tan-a))]
+    (loop [Ax Ax Ay Ay]
+      (if (wall? [Ax Ay] unit)
+        [Ax Ay]
+        (recur (+ Ax Xa) (+ Ay Ya))))))
+
 (defn- h-intersect
   [pos angle unit]
   (let [[x y] pos
@@ -85,6 +103,23 @@
       (if (wall? [Ax Ay] unit)
         [Ax Ay]
         (recur (+ Ax Xa) (+ Ay Ya))))))
+
+(defn- v-intersect-bug
+  [pos angle unit]
+  (let [[x y] pos
+        a angle
+        half-pi (/ Math/PI 2.0)
+        tan-a (Math/tan a)
+        Xa (if (< (- half-pi) angle half-pi) unit (- unit))
+        Ya (* Xa (Math/tan (- a)))
+        Bx (if (< (- half-pi) angle half-pi)
+             (+ (* (Math/floor (/ x unit)) unit) unit)
+             (dec (* (Math/floor (/ x unit)) unit)))
+        By (+ y (* (- x Bx) (Math/tan a)))]
+    (loop [Bx Bx By By]
+      (if (wall? [Bx By] unit)
+        [Bx By]
+        (recur (+ Bx Xa) (+ By Ya))))))
 
 (defn- v-intersect
   [pos angle unit]
@@ -110,9 +145,9 @@
   (Math/sqrt (+ (Math/pow (- x x-i) 2) (Math/pow (- y y-i) 2))))
 
 (defn find-intersect
-  [pos angle unit]
-  (let [[x-h y-h :as h-int] (h-intersect pos angle unit)
-        [x-v y-v :as v-int] (v-intersect pos angle unit)
+  [pos angle unit bug]
+  (let [[x-h y-h :as h-int] (if bug (h-intersect-bug pos angle unit) (h-intersect pos angle unit))
+        [x-v y-v :as v-int] (if bug (v-intersect-bug pos angle unit) (v-intersect pos angle unit))
         h-dist (distance pos h-int)
         v-dist (distance pos v-int)]
     (if (< h-dist v-dist) h-dist v-dist)))
@@ -127,7 +162,7 @@
         num-rays width]
     {:fov fov :half-fov (* fov 0.5) :world-size world-size :ray-inc ray-inc
      :rotation rotation :dir dir :res (/ q/PI 32) :pos (center-player-in-grid 10 6)
-     :num-rays num-rays :unit scale :pressed-keys #{} :accel 3}))
+     :num-rays num-rays :unit scale :pressed-keys #{} :accel 3 :bug false}))
 
 (defn setup
   []
@@ -187,11 +222,11 @@
         (q/triangle x1 y1 x2 y2 x3 y3)))))
 
 (defn- draw-rays
-  [{:keys [pos dir rotation unit] :as state}]
+  [{:keys [pos dir rotation unit bug] :as state}]
   (doall
    (map-indexed
     (fn [i alpha]
-      (let [length (find-intersect pos alpha unit)
+      (let [length (find-intersect pos alpha unit bug)
             [x1 y1] pos
             [x2 y2 :as p2] [(+ x1 (* length (q/cos alpha)))
                             (- y1 (* length (q/sin alpha)))]]
@@ -254,11 +289,9 @@
       state)))
 
 (defn debug
-  [{:keys [world-size accel pos pressed-keys rotation res dir unit] :as state}]
+  [{:keys [pressed-keys] :as state}]
   (if (contains? pressed-keys " ")
-    (do
-      (println state)
-      state)
+    (update-in state [:bug] #(not %))
     state))
 
 (defn draw
