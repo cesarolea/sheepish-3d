@@ -47,8 +47,10 @@
 (defn hit-detection
   "Receives p1 (origin) and p2 (destination) and returns a new point with it's (x,y) components
   not colliding with walls"
-  [p1 p2 unit]
-  (if (wall? p2 unit) p1 p2))
+  [[x1 y1] [x2 y2] length unit]
+  (let [xf (if (wall? [x2 y1] unit) x1 x2)
+        yf (if (wall? [x1 y2] unit) y1 y2)]
+    [xf yf]))
 
 (defn normalize-angle
   "Given an angle (in radians), return a corresponding angle that is normalized between 2π - π

@@ -83,7 +83,7 @@
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos rotation)))
                             (move-y y1 (* accel (q/sin rotation)))]]
-        (update-in state [:pos] #(engine/hit-detection % p2 unit)))
+        (update-in state [:pos] #(engine/hit-detection % p2 accel unit)))
       state)))
 
 (defn rotate
@@ -111,7 +111,7 @@
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos dir)))
                             (move-y y1 (* accel (q/sin dir)))]]
-        (update-in state [:pos] #(engine/hit-detection % p2 unit)))
+        (update-in state [:pos] #(engine/hit-detection % p2 accel unit)))
       state)))
 
 (defn update-world

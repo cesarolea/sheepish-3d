@@ -56,8 +56,10 @@
 (defn hit-detection
   "Receives p1 (origin) and p2 (destination) and returns a new point with it's (x,y) components
   not colliding with walls"
-  [p1 p2 unit]
-  (if (wall? p2 unit) p1 p2))
+  [[x1 y1] [x2 y2] length unit]
+  (let [xf (if (wall? [x2 y1] unit) x1 x2)
+        yf (if (wall? [x1 y2] unit) y1 y2)]
+    [xf yf]))
 
 (defn- center-player-in-grid
   "Given a set of grid coords, return a coordinate so that the player
@@ -257,7 +259,7 @@
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos rotation)))
                             (move-y y1 (* accel (q/sin rotation)))]]
-           (update-in state [:pos] #(hit-detection % p2 unit)))
+           (update-in state [:pos] #(hit-detection % p2 accel unit)))
       state)))
 
 (defn rotate
@@ -285,7 +287,7 @@
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos dir)))
                             (move-y y1 (* accel (q/sin dir)))]]
-        (update-in state [:pos] #(hit-detection % p2 unit)))
+        (update-in state [:pos] #(hit-detection % p2 accel unit)))
       state)))
 
 (defn debug
