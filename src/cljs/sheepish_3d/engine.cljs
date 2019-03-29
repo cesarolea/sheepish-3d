@@ -1,6 +1,7 @@
 (ns sheepish-3d.engine
   (:require [quil.core :as q :include-macros true]
-            [sheepish-3d.map :as g]))
+            [sheepish-3d.map :as g]
+            [sheepish-3d.textures :as t]))
 
 (defn key-pressed
   [{:keys [pressed-keys] :as state} {:keys [key key-code] :as event}]
@@ -102,15 +103,15 @@
   [dist beta]
   (* dist (Math/cos beta)))
 
-(defn distance
-  "Calculate distance to wall"
-  [[x y] [x-i y-i]]
-  (Math/sqrt (+ (Math/pow (- x x-i) 2) (Math/pow (- y y-i) 2))))
-
 (defn wall-height
   "Calculate wall height according to the wall distance"
   [distance unit projection-distance]
   (Math/ceil (* (/ unit distance) projection-distance)))
+
+(defn distance
+  "Calculate distance to wall"
+  [[x y] [x-i y-i]]
+  (Math/sqrt (+ (Math/pow (- x x-i) 2) (Math/pow (- y y-i) 2))))
 
 (defn find-intersect
   [pos angle unit]
@@ -119,8 +120,8 @@
         h-dist (distance pos h-int)
         v-dist (distance pos v-int)]
     (if (< h-dist v-dist)
-      [h-dist (get-cell-type h-int 64)]
-      [v-dist (get-cell-type v-int 64)])))
+      [h-dist (get-cell-type h-int 64) (mod x-h unit)]
+      [v-dist (get-cell-type v-int 64) (mod y-v unit)])))
 
 (defn ray-angles
   "Generate a list of angles (in radians) to use for rays"

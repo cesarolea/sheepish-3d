@@ -4,4 +4,5 @@
             [sheepish-3d.angles-demo]
             [sheepish-3d.world-building]
             [sheepish-3d.maze-runner]
-            [sheepish-3d.into-the-void]))
+            [sheepish-3d.into-the-void]
+            [sheepish-3d.textured]))

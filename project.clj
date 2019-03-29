@@ -7,9 +7,7 @@
   :pedantic? :abort
 
   :dependencies [[org.clojure/clojure "1.10.0"]
-                 [quil "2.3.0"]
                  [mount "0.1.13"]
-                 [seesaw "1.5.0"]
                  [quil "2.8.0"]]
 
   :main ^:skip-aot sheepish-3d.core

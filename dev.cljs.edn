@@ -1,4 +1,4 @@
 ^{:target-dir "resources"
- :watch-dirs ["src/cljs"]
+  :watch-dirs ["src/cljs"]
   :open-url false}
 {:main sheepish-3d.core}
