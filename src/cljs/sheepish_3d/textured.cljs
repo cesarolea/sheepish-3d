@@ -64,10 +64,10 @@
     (doall
      (map-indexed
       (fn [i alpha]
-        (let [[distance wall-type texture-offset] (engine/find-intersect pos alpha unit)
+        (let [[distance wall-type texture-offset hit-dir] (engine/find-intersect pos alpha unit)
               distance (engine/fishbowl-correction distance (- rotation alpha))
               wall-height (engine/wall-height distance unit projection-dist)
-              [sx sy] (t/get-texture-offset wall-type texture-offset)]
+              [sx sy] (t/get-texture-offset wall-type texture-offset hit-dir)]
           (let [y (/ (- height wall-height) 2)
                 canvas (:canvas @quaker-state)
                 textures (:textures @quaker-state)]

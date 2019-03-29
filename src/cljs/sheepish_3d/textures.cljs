@@ -3,10 +3,14 @@
 
 (defn get-texture-offset
   "Calculate the correct offset to load a texture"
-  [texture-number texture-slice]
+  [texture-number texture-slice direction]
   (let [row (Math/ceil (/ texture-number 3))
         x-offset (condp = (rem texture-number 3)
                    1 0
                    2 128
-                   0 256)]
+                   0 256)
+        x-offset (cond
+                   (= direction :h) x-offset
+                   (= direction :v) (+ x-offset 64)
+                   :else x-offset)]
     [(+ x-offset texture-slice) (int (* (dec row) 64))]))

@@ -77,7 +77,7 @@
         Ay (if (pos? angle) (dec Ay) Ay)]
     (loop [Ax Ax Ay Ay]
       (if (wall? [Ax Ay] unit)
-        [Ax Ay]
+        [(Math/floor Ax) (Math/floor Ay)]
         (recur (+ Ax Xa) (+ Ay Ya))))))
 
 (defn- v-intersect
@@ -93,7 +93,7 @@
         Bx (if (< (- half-pi) angle half-pi) Bx (dec Bx))]
     (loop [Bx Bx By By]
       (if (wall? [Bx By] unit)
-        [Bx By]
+        [(Math/floor Bx) (Math/floor By)]
         (recur (+ Bx Xa) (+ By Ya))))))
 
 (defn fishbowl-correction
@@ -120,8 +120,8 @@
         h-dist (distance pos h-int)
         v-dist (distance pos v-int)]
     (if (< h-dist v-dist)
-      [h-dist (get-cell-type h-int 64) (mod x-h unit)]
-      [v-dist (get-cell-type v-int 64) (mod y-v unit)])))
+      [h-dist (get-cell-type h-int 64) (Math/floor (mod x-h unit)) :h]
+      [v-dist (get-cell-type v-int 64) (Math/floor (mod y-v unit)) :v])))
 
 (defn ray-angles
   "Generate a list of angles (in radians) to use for rays"
