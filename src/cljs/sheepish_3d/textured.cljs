@@ -90,11 +90,11 @@
   (let [start (q/millis)]
 
     ;; draw background
-    (q/background 98 114 164)
+    (q/background 1 111 112)
 
     ;; draw floor
-    (q/with-stroke [68 71 90]
-      (q/with-fill [68 71 90]
+    (q/with-stroke [112 112 112]
+      (q/with-fill [112 112 112]
         (q/rect 0 (/ (get world-size 1) 2)
                 (get world-size 0) (get world-size 1))))
 
