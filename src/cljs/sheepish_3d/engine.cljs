@@ -33,10 +33,21 @@
 
 (defn wall?
   [point unit]
-  (let [[px py] point
-        [x y] (coord->grid point unit)]
+  (let [[x y] (coord->grid point unit)]
     (or (not (inside-map? point unit))
         (> (grid-value x y) 0))))
+
+(defn thin-hor-wall?
+  [point unit]
+  (let [[x y] (coord->grid point unit)]
+    (or (not (inside-map? point unit))
+        (= (grid-value x y) \H))))
+
+(defn thin-ver-wall?
+  [point unit]
+  (let [[x y] (coord->grid point unit)]
+    (or (not (inside-map? point unit))
+        (= (grid-value x y) \V))))
 
 (defn get-cell-type
   [point unit]
@@ -48,9 +59,13 @@
 (defn hit-detection
   "Receives p1 (origin) and p2 (destination) and returns a new point with it's (x,y) components
   not colliding with walls"
-  [[x1 y1] [x2 y2] length unit]
-  (let [xf (if (wall? [x2 y1] unit) x1 x2)
-        yf (if (wall? [x1 y2] unit) y1 y2)]
+  [[x1 y1] [x2 y2] unit]
+  (let [xf (if (or (wall? [x2 y1] unit)
+                   (thin-hor-wall? [x2 y1] unit)
+                   (thin-ver-wall? [x2 y1] unit)) x1 x2)
+        yf (if (or (wall? [x1 y2] unit)
+                   (thin-hor-wall? [x1 y2] unit)
+                   (thin-ver-wall? [x1 y2] unit)) y1 y2)]
     [xf yf]))
 
 (defn normalize-angle
@@ -76,9 +91,13 @@
         Ax (+ x (/ (- y Ay) tan-a))
         Ay (if (pos? angle) (dec Ay) Ay)]
     (loop [Ax Ax Ay Ay]
-      (if (wall? [Ax Ay] unit)
-        [(Math/floor Ax) (Math/floor Ay)]
-        (recur (+ Ax Xa) (+ Ay Ya))))))
+      (cond
+        ;; a regular wall
+        (wall? [Ax Ay] unit) [(Math/floor Ax) (Math/floor Ay)]
+        ;; a thin horizontal wall
+        (thin-hor-wall? [Ax Ay] unit) [(Math/floor (+ Ax (* 0.5 Xa))) (Math/floor (+ Ay (* 0.5 Ya)))]
+        ;; no wall, extend the ray
+        :else (recur (+ Ax Xa) (+ Ay Ya))))))
 
 (defn- v-intersect
   [pos angle unit]
@@ -92,9 +111,13 @@
         By (+ y (* (- x Bx) (Math/tan angle)))
         Bx (if (< (- half-pi) angle half-pi) Bx (dec Bx))]
     (loop [Bx Bx By By]
-      (if (wall? [Bx By] unit)
-        [(Math/floor Bx) (Math/floor By)]
-        (recur (+ Bx Xa) (+ By Ya))))))
+      (cond
+        ;; a regular wall
+        (wall? [Bx By] unit) [(Math/floor Bx) (Math/floor By)]
+        ;; a thin vertical wall
+        (thin-ver-wall? [Bx By] unit) [(Math/floor (+ Bx (* 0.5 Xa))) (Math/floor (+ By (* 0.5 Ya)))]
+        ;; no wall, extend the ray
+        :else (recur (+ Bx Xa) (+ By Ya))))))
 
 (defn fishbowl-correction
   "Implement fishbowl correction to calculated distance. To remove the viewing distortion,
@@ -130,3 +153,5 @@
         ray-angle (+ rotation half-fov)]
     (map (fn [n-ray] (normalize-angle (- ray-angle (* n-ray ray-inc))))
          (range 1 (inc width)))))
+
+(def ray-angles-m (memoize ray-angles))

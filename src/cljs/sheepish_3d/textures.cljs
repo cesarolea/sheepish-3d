@@ -4,7 +4,9 @@
 (defn get-texture-offset
   "Calculate the correct offset to load a texture"
   [texture-number texture-slice direction]
-  (let [row (Math/ceil (/ texture-number 3))
+  (let [thin-walls #{\V \H}
+        texture-number (if (contains? thin-walls texture-number) 50 texture-number)
+        row (Math/ceil (/ texture-number 3))
         x-offset (condp = (rem texture-number 3)
                    1 0
                    2 128

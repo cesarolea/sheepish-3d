@@ -34,8 +34,8 @@
     (load-texture "textures/textures.png")
     (canvas-ref "textured")
     {:fov fov :half-fov (* fov 0.5) :world-size world-size :ray-inc ray-inc
-     :rotation rotation :dir dir :res (/ q/PI 32) :pos [100 100]
-     :num-rays num-rays :unit unit :pressed-keys #{} :accel 3
+     :rotation rotation :dir dir :res (/ q/PI 64) :pos [100 100]
+     :num-rays num-rays :unit unit :pressed-keys #{} :accel 5
      :projection-dist (int (/ (/ width 2) (Math/tan half-fov)))}))
 
 (defn setup
@@ -72,7 +72,7 @@
                 canvas (:canvas @quaker-state)
                 textures (:textures @quaker-state)]
             (.drawImage canvas textures sx sy 1 64 i y 1 wall-height))))
-      (engine/ray-angles state)))))
+      (engine/ray-angles-m state)))))
 
 (defn- draw-fps
   [state start]
@@ -106,15 +106,19 @@
   [{:keys [world-size accel pos pressed-keys rotation unit] :as state}]
   (let [[width height] world-size
         accel (if (contains? pressed-keys "shift") (* accel 1.5) accel)
-        move-x (cond (contains? pressed-keys "w") +
-                     (contains? pressed-keys "s") -)
-        move-y (cond (contains? pressed-keys "w") -
-                     (contains? pressed-keys "s") +)
+        move-x (cond (contains? pressed-keys "w")    +
+                     (contains? pressed-keys "up")   +
+                     (contains? pressed-keys "s")    -
+                     (contains? pressed-keys "down") -)
+        move-y (cond (contains? pressed-keys "w")    -
+                     (contains? pressed-keys "up")   -
+                     (contains? pressed-keys "s")    +
+                     (contains? pressed-keys "down") +)
         [x1 y1] pos]
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos rotation)))
                             (move-y y1 (* accel (q/sin rotation)))]]
-        (update-in state [:pos] #(engine/hit-detection % p2 accel unit)))
+        (update-in state [:pos] #(engine/hit-detection % p2 unit)))
       state)))
 
 (defn rotate
@@ -142,7 +146,7 @@
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos dir)))
                             (move-y y1 (* accel (q/sin dir)))]]
-        (update-in state [:pos] #(engine/hit-detection % p2 accel unit)))
+        (update-in state [:pos] #(engine/hit-detection % p2 unit)))
       state)))
 
 (defn update-world
