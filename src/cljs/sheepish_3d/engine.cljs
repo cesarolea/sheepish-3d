@@ -60,12 +60,13 @@
   "Receives p1 (origin) and p2 (destination) and returns a new point with it's (x,y) components
   not colliding with walls"
   [[x1 y1] [x2 y2] unit]
-  (let [xf (if (or (wall? [x2 y1] unit)
-                   (thin-hor-wall? [x2 y1] unit)
-                   (thin-ver-wall? [x2 y1] unit)) x1 x2)
-        yf (if (or (wall? [x1 y2] unit)
-                   (thin-hor-wall? [x1 y2] unit)
-                   (thin-ver-wall? [x1 y2] unit)) y1 y2)]
+  (let [[xa ya] [x2 y2]
+        xf (if (or (wall? [xa y1] unit)
+                   (thin-hor-wall? [xa y1] unit)
+                   (thin-ver-wall? [xa y1] unit)) x1 x2)
+        yf (if (or (wall? [x1 ya] unit)
+                   (thin-hor-wall? [x1 ya] unit)
+                   (thin-ver-wall? [x1 ya] unit)) y1 y2)]
     [xf yf]))
 
 (defn normalize-angle
