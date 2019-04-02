@@ -59,8 +59,16 @@
 (defn hit-detection
   "Receives p1 (origin) and p2 (destination) and returns a new point with it's (x,y) components
   not colliding with walls"
-  [[x1 y1] [x2 y2] unit]
-  (let [[xa ya] [x2 y2]
+  [[x1 y1] [x2 y2] angle move-dir unit]
+  (let [half-pi (* 0.5 Math/PI)
+        move-y (if (pos? angle) (if (or (= move-dir :left)
+                                        (= move-dir :up)) - +) (if (or (= move-dir :left)
+                                                                       (= move-dir :up)) + -))
+        move-x (if (< (- half-pi) angle half-pi) (if (or (= move-dir :left)
+                                                         (= move-dir :up)) + -) (if (or (= move-dir :left)
+                                                                                        (= move-dir :up)) - +))
+        half-unit (* 0.5 unit)
+        [xa ya] [(move-x x2 half-unit) (move-y y2 half-unit)]
         xf (if (or (wall? [xa y1] unit)
                    (thin-hor-wall? [xa y1] unit)
                    (thin-ver-wall? [xa y1] unit)) x1 x2)
@@ -96,7 +104,7 @@
         ;; a regular wall
         (wall? [Ax Ay] unit) [(Math/floor Ax) (Math/floor Ay)]
         ;; a thin horizontal wall
-        (thin-hor-wall? [Ax Ay] unit) [(Math/floor (+ Ax (* 0.5 Xa))) (Math/floor (+ Ay (* 0.5 Ya)))]
+        (thin-hor-wall? [Ax Ay] unit) [(Math/floor (+ Ax (* 0.2 Xa))) (Math/floor (+ Ay (* 0.2 Ya)))]
         ;; no wall, extend the ray
         :else (recur (+ Ax Xa) (+ Ay Ya))))))
 
@@ -116,7 +124,7 @@
         ;; a regular wall
         (wall? [Bx By] unit) [(Math/floor Bx) (Math/floor By)]
         ;; a thin vertical wall
-        (thin-ver-wall? [Bx By] unit) [(Math/floor (+ Bx (* 0.5 Xa))) (Math/floor (+ By (* 0.5 Ya)))]
+        (thin-ver-wall? [Bx By] unit) [(Math/floor (+ Bx (* 0.2 Xa))) (Math/floor (+ By (* 0.2 Ya)))]
         ;; no wall, extend the ray
         :else (recur (+ Bx Xa) (+ By Ya))))))
 

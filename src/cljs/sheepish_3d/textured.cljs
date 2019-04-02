@@ -34,7 +34,7 @@
     (load-texture "textures/textures.png")
     (canvas-ref "textured")
     {:fov fov :half-fov (* fov 0.5) :world-size world-size :ray-inc ray-inc
-     :rotation rotation :dir dir :res (/ q/PI 64) :pos [100 100]
+     :rotation rotation :dir dir :res (/ q/PI 64) :pos [150 150]
      :num-rays num-rays :unit unit :pressed-keys #{} :accel 5
      :projection-dist (int (/ (/ width 2) (Math/tan half-fov)))}))
 
@@ -75,15 +75,19 @@
       (engine/ray-angles-m state)))))
 
 (defn- draw-fps
-  [state start]
+  [{:keys [rotation dir] :as state} start]
   (let [end (gstring/format "%.1f" (/ 1.0 (* 0.001 (- (q/millis) start))))]
     (q/with-fill [255 184 108]
       (q/text "Current FPS: " 10 15)
-      (q/text "  Target FPS: " 10 30))
+      (q/text "  Target FPS: " 10 30)
+      (q/text "       Rotation: " 10 45)
+      (q/text "      Direction: " 10 60))
 
     (q/with-fill [80 250 123]
       (q/text (q/current-frame-rate) 90 15)
-      (q/text (q/target-frame-rate) 91 30))))
+      (q/text (q/target-frame-rate) 91 30)
+      (q/text (q/degrees rotation) 90 45)
+      (q/text (q/degrees dir) 90 60))))
 
 (defn draw
   [{:keys [world-size] :as state}]
@@ -118,7 +122,8 @@
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos rotation)))
                             (move-y y1 (* accel (q/sin rotation)))]]
-        (update-in state [:pos] #(engine/hit-detection % p2 unit)))
+        (update-in state [:pos] #(engine/hit-detection % p2 rotation (if (or (contains? pressed-keys "w")
+                                                                             (contains? pressed-keys "up")) :up :down) unit)))
       state)))
 
 (defn rotate
@@ -146,7 +151,7 @@
     (if (and move-x move-y)
       (let [[x2 y2 :as p2] [(move-x x1 (* accel (q/cos dir)))
                             (move-y y1 (* accel (q/sin dir)))]]
-        (update-in state [:pos] #(engine/hit-detection % p2 unit)))
+        (update-in state [:pos] #(engine/hit-detection % p2 dir (if (contains? pressed-keys "a") :left :right) unit)))
       state)))
 
 (defn update-world
