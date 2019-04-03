@@ -46,9 +46,9 @@ It will generate JavaScript with all optimizations turned on. Output is written 
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [ClojureScript](https://clojurescript.org/)
+* [Figwheel](https://figwheel.org/)
+* [Quil](http://quil.info/)
 
 ## Authors
 
@@ -78,7 +78,7 @@ This work is published from:
 
 ## Acknowledgments
 
-* id Software for inspiration and countless hours of demons and shotguns.
+* id Software for inspiration and countless hours of demons and shotguns (and the textures, sorry about that).
 * [Fabien Sanglard](http://fabiensanglard.net/) for his awesome articles and especially the Wolfenstein black book that inspired me to finally sit down and code.
-* [This raycasting tutorial][https://permadi.com/1996/05/ray-casting-tutorial-table-of-contents/]
+* [This raycasting tutorial](https://permadi.com/1996/05/ray-casting-tutorial-table-of-contents/)
 * [This other raycaster in Clojure](https://github.com/hpointu/clj-raycast-world)
