@@ -21,7 +21,8 @@
     {:fov fov :half-fov (* fov 0.5) :world-size world-size :ray-inc ray-inc
      :rotation rotation :dir dir :res (/ q/PI 32) :pos [100 100]
      :num-rays num-rays :unit unit :pressed-keys #{} :accel 3
-     :projection-dist (int (/ (/ width 2) (Math/tan half-fov)))}))
+     :projection-dist (int (/ (/ width 2) (Math/tan half-fov)))
+     :fishbowl-correction true}))
 
 (defn setup
   []
@@ -30,13 +31,15 @@
   (initial-state))
 
 (defn- draw-columns
-  [{:keys [pos dir rotation unit world-size projection-dist] :as state}]
+  [{:keys [pos dir rotation unit world-size projection-dist fishbowl-correction] :as state}]
   (let [[width height] world-size]
     (doall
      (map-indexed
       (fn [i alpha]
         (let [[distance wall-type] (engine/find-intersect pos alpha unit)
-              distance (engine/fishbowl-correction distance (- rotation alpha))
+              distance (if fishbowl-correction
+                         (engine/fishbowl-correction distance (- rotation alpha))
+                         distance)
               wall-height (engine/wall-height distance unit projection-dist)]
           (q/with-fill (get g/color-map wall-type [255 184 108])
             (q/with-stroke (get g/color-map wall-type [255 184 108])
@@ -115,9 +118,16 @@
         (update-in state [:pos] #(engine/hit-detection % p2 dir (if (contains? pressed-keys "a") :left :right) unit)))
       state)))
 
+(defn fishbowl-toggle
+  "Rotate camera left/right"
+  [{:keys [fishbowl-correction pressed-keys] :as state}]
+  (if (contains? pressed-keys " ")
+    (update-in state [:fishbowl-correction] (constantly false))
+    (update-in state [:fishbowl-correction] (constantly true))))
+
 (defn update-world
   [state]
-  (-> state move rotate strafe))
+  (-> state move rotate strafe fishbowl-toggle))
 
 (q/defsketch sheepish-3D
   :host "sheepish-3D"

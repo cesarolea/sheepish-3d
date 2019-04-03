@@ -79,15 +79,11 @@
   (let [end (gstring/format "%.1f" (/ 1.0 (* 0.001 (- (q/millis) start))))]
     (q/with-fill [255 184 108]
       (q/text "Current FPS: " 10 15)
-      (q/text "  Target FPS: " 10 30)
-      (q/text "       Rotation: " 10 45)
-      (q/text "      Direction: " 10 60))
+      (q/text "  Target FPS: " 10 30))
 
     (q/with-fill [80 250 123]
       (q/text (q/current-frame-rate) 90 15)
-      (q/text (q/target-frame-rate) 91 30)
-      (q/text (q/degrees rotation) 90 45)
-      (q/text (q/degrees dir) 90 60))))
+      (q/text (q/target-frame-rate) 91 30))))
 
 (defn draw
   [{:keys [world-size] :as state}]
