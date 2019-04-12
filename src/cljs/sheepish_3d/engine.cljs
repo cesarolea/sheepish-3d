@@ -133,7 +133,7 @@
   the resulting distance must be multiplied by cos(BETA); where BETA is the angle of the ray that is
   being cast relative to the viewing angle."
   [dist beta]
-  (* dist (Math/cos beta)))
+  (Math/round (* dist (Math/cos beta))))
 
 (defn wall-height
   "Calculate wall height according to the wall distance"
